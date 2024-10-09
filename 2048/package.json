@@ -1,0 +1,21 @@
+{
+    "name": "2048-game",
+    "version": "1.0.0",
+    "description": "A 2048 game project using PicoCSS, GSAP, Express, and more.",
+    "main": "index.js",
+    "scripts": {
+      "start": "node index.js",
+      "build-sass": "sass --watch styles.scss:styles.css"
+    },
+    "dependencies": {
+      "@picocss/pico": "^2.0.6",
+      "express": "^4.21.0",
+      "gsap": "^3.12.5",
+      "http-proxy-middleware": "^3.0.0",
+      "lottie-web": "^5.12.2",
+      "sass": "^1.78.0"
+    },
+    "author": "bb9rj",
+    "license": "MIT"
+  }
+  
