@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Fish Town</title>
+	<!-- jQuery -->
+	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+
+	<!-- fontawesome -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<script type="text/javascript">
+
+var Game = {
+	fish: 0,
+	money: 0,
+	population: 1,
+	community: 1,
+	fishermen: 0,
+	tickspeed: 1000,
+	paused: false,
+	items: [],
+	cost: {
+		community: 4
+	},
+	expedition: {
+		number: 0,
+		fishermen: 1,
+		time: 99,
+		totaltime: 99,
+		cost: 0,
+		type: 'fish',
+		reward: 'none'
+	},
+	drops: [
+		{
+			name: 'Old Boot',
+			info: "A man's boot, worn out from years in the sea.",
+			value: 1
+		},
+		{
+			name: 'Seaweed',
+			info: 'Slimy seaweed dredged from the bottom of the ocean.',
+			value: 1
+		},
+		{
+			name: 'Woodenfish',
+			info: 'A fish made of wood? I guess so.',
+			value: 2
+		},
+		{
+			name: 'Silverfish',
+			info: 'This fish is shiny. Too shiny.',
+			value: 3
+		},
+		{
+			name: 'Goldenfish',
+			info: 'The goldenfish shimmers in the sunlight.',
+			value: 5
+		},
+		{
+			name: 'Diamondfish',
+			info: "This fish is made of diamonds. Don't eat it.",
+			value: 10
+		}
+	]
+}
+
+function prettify(input) {
+	var output = Math.round(input * 1000000)/1000000;
+	return output;
+}
+
+function getRandom(bottom, top) {
+	return Math.floor(Math.random() * (1 + top - bottom)) + bottom;
+}
+
+function load() {
+	start();
+	updateExpedition();
+}
+
+function pause() {
+	if (Game.paused == false) {
+		clearInterval(auto);
+		Game.paused = true;
+		$('.pauseCheck').addClass("checked");
+	}
+	else {
+		start();
+		Game.paused = false;
+		$('.pauseCheck').removeClass("checked");
+	}
+}
+
+function start() {
+	window.auto = setInterval(idle, Game.tickspeed);
+	update();
+}
+
+function change(value, number) {
+	Game[value] += number;
+	animatedInc('.' + value, number);
+	update();
+}
+
+function animatedInc(resource, amount) {
+	if (amount > 0) {
+		var recinc = resource + ' + .posinc';
+		$(recinc).remove();
+		$(resource).after("<span class='posinc'> +" + amount + "</span>");
+		$(recinc).addClass("animate");
+	}
+	else if (amount < 0) {
+		var recinc = resource + ' + .neginc';
+		$(recinc).remove();
+		$(resource).after("<span class='neginc'> " + amount + "</span>");
+		$(recinc).addClass("animate");
+	}
+}
+
+function idle() {
+	if (Game.fish >= Game.community) {
+		change("fish", -Game.community);
+		change("money", Game.community / 10);
+	}
+	if (Game.fishermen >= 1) {
+		change("fish", Game.fishermen);
+	}
+}
+
+function addFish(number) {
+	change("fish", 1);
+}
+
+function addFisherman(number) {
+	if (Game.community >= number) {
+		change("community", -number);
+		change("fishermen", number);
+	}
+}
+
+function removeFisherman(number) {
+	if (Game.fishermen >= number) {
+		change("community", number);
+		change("fishermen", -number);
+	}
+}
+
+function expandCommunity() {
+	if (Game.money >= Game.cost.community) {
+		change("money", -Game.cost.community);
+		Game.population++;
+		Game.cost.community = Math.floor((Game.population * 10)/3) + 1;
+		change("community", 1);
+	}
+}
+
+function update() {
+	$('.fish').html(Game.fish);
+	$('.money').html(prettify(Game.money));
+	$('.community').html(Game.community);
+	$('.fishermen').html(Game.fishermen);
+	$('.cost_community').html(Game.cost.community);
+	$('.expedition_number').html(Game.expedition.number);
+
+	$('.exp_fishermen').html(Game.expedition.fishermen);
+	$('.exp_time').html(Game.expedition.time);
+	$('.exp_cost').html(Game.expedition.totaltime * Game.expedition.cost);
+	$('.exp_type').html(Game.expedition.type);
+}
+
+function showPanel(panel) {
+	$(panel).show();
+	showModal();
+}
+
+function showModal() {
+	$('.modal').show();
+}
+
+function hideModal() {
+	$('.modal').hide();
+	$('.modal-panel').hide();
+}
+
+function initExpedition(fishermen, time, cost, type, reward) {
+	Game.expedition.fishermen = fishermen;
+	Game.expedition.time = time;
+	Game.expedition.totaltime = time;
+	Game.expedition.cost = cost;
+	Game.expedition.type = type;
+	Game.expedition.reward = reward;
+	update();
+}
+
+function startExpedition() {
+	if (Game.fishermen >= Game.expedition.fishermen) {
+		change("fishermen", -Game.expedition.fishermen);
+		window.int = setInterval(expedition, Game.tickspeed);
+	}
+	else {
+		$('.log').html("You need more fishermen to embark on the expedition.");
+	}
+}
+
+function expedition() {
+	if (Game[Game.expedition.type] <= 0) {
+
+			clearInterval(int);
+			$('#exp_inner').css({
+				"width" : "100%"
+			});
+			$('.log').html("The expedition is a failure. The fisherman comes back empty-handed.");
+			change("fishermen", Game.expedition.fishermen);
+			updateExpedition();
+
+	}
+	else if (Game.expedition.time <= 0) {
+
+			clearInterval(int);
+			$('#exp_inner').css({
+				"width" : "100%"
+			});
+
+			var dropNo = Math.floor(Math.random() * Game.drops.length);
+			var dropName = Game.drops[dropNo].name;
+			var dropInfo = Game.drops[dropNo].info;
+			var dropValue = Game.drops[dropNo].value;
+
+			newItem(dropName, dropInfo, dropValue);
+
+			var lc = dropName.toLowerCase();
+
+			$('.log').html("The expedition is a success! Your fisherman come back with a " + lc + ".");
+			change("fishermen", Game.expedition.fishermen);
+			Game.expedition.number++;
+			updateExpedition();
+
+	}
+	else {
+
+			Game.expedition.time--;
+			change(Game.expedition.type, -Game.expedition.cost);
+			var percentage = (Game.expedition.time / Game.expedition.totaltime) * 100;
+			$('#exp_inner').css({
+				"width" : percentage + "%"
+			});
+
+	}
+}
+
+function updateExpedition() {
+	var num = Game.expedition.number + 1;
+
+	var fishermen = Math.floor((num * 2)/9) + 1;
+	var time = Math.floor((num * 10)/3) + 1;
+	var cost = Math.floor((num * 1)/9) + 1;
+
+	initExpedition(fishermen, time, cost, 'fish', '');
+}
+
+function balanceTest() {
+	var i;
+	for (i = 0; i < 10; i++) {
+		var num = i + 1;
+
+		//values go here
+		var fishermen = Math.floor((num * 2)/9) + 1;
+		var time = Math.floor((num * 10)/3) + 1;
+		var cost = Math.floor((num * 1)/9) + 1;
+
+		console.log("[" + i + "] Fishermen: " + fishermen + " Time: " + time + " Cost: " + cost);
+	}
+}
+
+function newItem(name, info, value) {
+	Game.items.push({
+		name: name,
+		info: info,
+		value: value
+	});
+	updateItems();
+}
+
+function updateItems() {
+	$('.items').html("");
+	var i;
+	for (i = 0; i < Game.items.length; i++) {
+		$('.items').append(
+			"<div class='item'><div class='item_name'>" + Game.items[i].name + "</div><div class='btn sell' onclick='sell(" + i + ")'>Sell</div></div>" +
+			"<div class='info'>" + Game.items[i].info + "<br>Value: " + Game.items[i].value + "</div>"
+		);
+	}
+}
+
+function sell(number) {
+	var value = Game.items[number].value;
+	change("money", value);
+
+	Game.items.splice(number, 1);
+	updateItems();
+}
+
+</script>
+</head>
+<body onload="load()">
+
+<div class="modal">
+	<div class="container">
+		<div class="modal-panel" id="modal-info">
+			<span class="exit" onclick="hideModal()">&#x00D7;</span>
+			<p>Fish Town, made by KudosInc.</p>
+			<p>Inspired by this reddit post as part of /r/incremental games' Mind Dump Mondays.</p>
+			<div class="reddit-embed" data-embed-media="www.redditmedia.com" data-embed-parent="false" data-embed-live="false" data-embed-uuid="a8de63dc-925a-4e1c-962f-bb3329c94174" data-embed-created="2018-09-25T07:48:43.452Z"><a href="https://www.reddit.com/r/incremental_games/comments/9id93a/mind_dump_monday_20180924/e6jrh80/">Comment</a> from discussion <a href="https://www.reddit.com/r/incremental_games/comments/9id93a/mind_dump_monday_20180924/">Mind Dump Monday 2018-09-24</a>.</div><script async src="https://www.redditstatic.com/comment-embed.js"></script>
+		</div>
+	</div>
+</div>
+
+<div class="header">
+	<div class="container">
+		<h1 class="name">Fish Town</h1>
+
+		<div style="float: right;">
+			<a class="btn btn-white" onclick="showPanel('#modal-info')">Info</a>
+		</div>
+
+		<div style="clear: both;"></div>
+	</div>
+</div>
+
+<div class="container">
+	<div class="log">Welcome to Fish Town! version 0.2</div>
+
+	<div class="left" style="max-width: calc(100% - 14rem)">
+		<div class="title">Fish</div>
+		<button class="btn" onclick="addFish(1)">Go fishing.</button>
+		<div class="info">
+			Catch a fish from the local pond.
+		</div>
+
+		<div class="spacer"></div>
+
+		<div class="title">Manage</div>
+		<button class="btn" onclick="addFisherman(1)">Designate Fisherman.</button>
+		<div class="info">
+			Employs one member of the community as a fisherman.
+		</div>
+
+		<button class="btn" onclick="removeFisherman(1)">Remove Fisherman.</button>
+		<div class="info">
+			Relieves one fisherman from his or her duties.
+		</div>
+
+		<div class="spacer"></div>
+
+		<div class="title">Expand</div>
+		<button class="btn" onclick="expandCommunity()">Expand community.</button>
+		<div class="info">
+			Implores another person to join your community.
+			<br>
+			Cost: <span class="cost_community">0</span> money
+		</div>
+
+		<div class="spacer"></div>
+
+		<div class="title">
+			Expeditions
+			<div style="float: right; font-weight: normal;">
+				Total embarked: <span class="expedition_number">0</span>
+			</div>
+		</div>
+
+		<div style="color: #999;">
+			As your team adventurers, they will consume supplies. If their supply runs out before the expedition ends it will be a failure.
+		</div>
+
+		<div class="expedition expedition_1">
+			<div class="desc_expedition" style="color: #444;">
+				Embark upon a fishing journey into the wilderness, with the promise of untold treasures at its end.
+			</div>
+
+			<div class="spacer-sm">
+				<button class="btn" onclick="startExpedition()">Begin expedition.</button>
+				<div class="info">
+					Time: <span class="exp_time">0</span> seconds
+					<br>
+					Cost: <span class="exp_cost">0</span> <span class="exp_type">fish</span>, <span class="exp_fishermen">0</span> fishermen
+				</div>
+			</div>
+
+			<div class="bar" id="exp_bar">
+				<div class="inner" id="exp_inner"></div>
+			</div>
+		</div>
+	</div>
+	<div class="right" style="width: 12rem;">
+		<table class="stats">
+			<tr>
+				<th colspan="2">You</th>
+			</tr>
+			<tr>
+				<td>Rod</td>
+				<td>Wood Rod</td>
+			</tr>
+			<tr>
+				<td>Bait</td>
+				<td>Worms</td>
+			</tr>
+		</table>
+
+		<div class="spacer"></div>
+
+		<table class="stats">
+			<tr>
+				<th colspan="2">Resorces</th>
+			</tr>
+			<tr>
+				<td>Fish</td>
+				<td><span class="fish">0</span></td>
+			</tr>
+			<tr>
+				<td>Money</td>
+				<td><span class="money">0</span></td>
+			</tr>
+		</table>
+
+		<div class="spacer"></div>
+
+		<table class="stats">
+			<tr>
+				<th colspan="2">Population</th>
+			</tr>
+			<tr>
+				<td>Community</td>
+				<td><span class="community">1</span></td>
+			</tr>
+			<tr>
+				<td>Fishermen</td>
+				<td><span class="fishermen">0</span></td>
+			</tr>
+		</table>
+
+		<div class="spacer" style="text-align: center;">
+			<div onclick="pause()" style="cursor: pointer;">
+				<span class="grey">Pause Idle Generation</span>
+				<div class="toggle pauseCheck"></div>
+			</div>
+		</div>
+
+		<div class="spacer"></div>
+
+		<div class="title" style="margin-bottom: 0;">Items</div>
+		<div class="items">
+		</div>
+	</div>
+</div>
+
+<style type="text/css">
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+
+* {
+	box-sizing: border-box;
+}
+
+html {
+	font-size: 16px;
+}
+
+body {
+	height: 100vh;
+	margin: 0;
+	font-size: 1em;
+	position: relative;
+}
+
+body, button {
+	font-family: 'Roboto', sans-serif;
+}
+
+.log {
+	line-height: 2.5rem;
+	height: 2.5rem;
+	color: #333;
+	background-color: #f4f4f4;
+	box-shadow: inset 0px 2px 6px rgba(0,0,0,0.15);
+	border-radius: 1.25rem;
+	padding: 0 1.5rem;
+	white-space: nowrap;
+	overflow: hidden;
+	margin-bottom: 1rem;
+}
+
+.toggle {
+	display: inline-block;
+	height: 1.2rem;
+	width: 1.2rem;
+	border: 2px solid #ddd;
+	border-radius: 0.3rem;
+	cursor: pointer;
+	margin-bottom: -0.3rem;
+}
+
+.toggle.checked {
+	background-color: #88dda6;
+	border-color: #60d288;
+}
+
+.expedition {
+	margin: 1rem 0.5rem;
+	padding: 1rem;
+	border: 1px solid #ddd;
+	border-radius: 0.3rem;
+}
+
+.modal > .container {
+	height: 100%;
+	overflow: auto;
+}
+
+.modal {
+	display: none;
+	position: fixed;
+	height: 100%;
+	width: 100%;
+	background-color: rgba(0,0,0,0.5);
+	z-index: 99;
+}
+
+.modal-panel {
+	background-color: white;
+	margin: 4rem 1rem;
+	padding: 1rem;
+	border-radius: 4px;
+	max-height: calc(100% - 8rem);
+	overflow: auto;
+}
+
+.exit {
+	float: right;
+	font-size: 1.5em;
+	margin-top: -0.5rem;
+	cursor: pointer;
+}
+
+.exit:hover {
+	color: #ff5050;
+}
+
+.spacer {
+	margin: 2rem 0;
+}
+
+.spacer-sm {
+	margin: 1rem 0;
+}
+
+.grey {
+	color: #999;
+	font-size: 0.9em;
+}
+
+.btn {
+	cursor: pointer;
+	font-size: 1em;
+	padding: 0.3rem 0.8rem;
+	margin: 0.15rem 0;
+	border-radius: 4px;
+	background-color: #4da8e6;
+	border: 0;
+	color: white;
+}
+
+.btn:active {
+	background-color: #2093df;
+}
+
+.btn:focus {
+	outline: none;
+}
+
+.info {
+	max-width: 25%;
+	display: none;
+	position: absolute;
+	font-size: 0.9em;
+	padding: 0.5rem;
+	margin: 0.2rem 0;
+	color: white;
+	background-color: rgba(0,0,0,0.6);
+	border-radius: 4px;
+}
+
+.btn:hover + .info,
+.btn + .info:hover {
+	display: block;
+}
+
+.btn-white {
+	color: #333;
+	background-color: white;
+	box-shadow: 0px 2px 10px rgba(0,0,0,0.15);
+}
+
+.btn-white:active {
+	background-color: white;
+}
+
+.header {
+	background-color: #eee;
+	box-shadow: inset 0px -2px 10px rgba(0,0,0,0.15);
+	height: 5rem;
+	line-height: 5rem;
+}
+
+.header + .container {
+	padding: 20px 0;
+}
+
+.container {
+	width: 50%;
+	margin: 0 auto;
+}
+
+.left {
+	float: left;
+}
+
+.right {
+	float: right;
+}
+
+.name {
+	font-size: 2em;
+	margin: 0;
+	float: left;
+	font-weight: normal;
+}
+
+.title {
+	font-weight: bold;
+	padding: 0.5rem;
+	margin: 0 0 0.5rem 0;
+	border-bottom: 1px solid #999;
+}
+
+.stats {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.stats td, .stats th {
+	padding: 0.5rem;
+}
+
+.stats tr {
+	border-bottom: 1px solid #999;
+}
+
+.stats td:not(:first-child) {
+	text-align: right;
+}
+
+.bar {
+	width: 50%;
+	background-color: #eee;
+	box-shadow: inset 0px 2px 8px rgba(0,0,0,0.05);
+}
+
+.inner {
+	width: 100%;
+	min-height: 1rem;
+	background-color: #60d288;
+	transition: 300ms linear;
+}
+
+.posinc {
+	position: absolute;
+	color: #60d288;
+}
+
+.neginc {
+	position: absolute;
+	color: #ff5050;
+	margin-left: 1rem;
+}
+
+.item {
+	overflow: auto;
+	width: 100%;
+	padding: 0.5rem;
+	border-bottom: 1px solid #999;
+}
+
+.item_name {
+	float: left;
+	padding: 0.2rem 0;
+}
+
+.sell {
+	float: right;
+	padding: 0.2rem 1rem;
+	margin: 0;
+}
+
+.item + .info {
+	margin-left: 12.5rem;
+	margin-top: -2.7rem;
+}
+
+.item:hover + .info,
+.item + .info:hover {
+	display: block;
+}
+
+
+.animate {
+	animation: animate 600ms ease;
+	animation-iteration-count: 1;
+	animation-fill-mode: forwards;
+}
+
+@keyframes animate {
+    0%   {
+    	text-indent: 0rem;
+    }
+    50%  {
+    	opacity: 1;
+    }
+    100% {
+    	text-indent: 1.5rem;
+    	opacity: 0;
+    }
+}
+
+</style>
+</body>
+</html>

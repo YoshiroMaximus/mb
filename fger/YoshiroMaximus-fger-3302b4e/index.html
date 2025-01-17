@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>80mil</title>
+	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="css.css">
+</head>
+<body>
+
+<div class="wrapper">
+	<div class="game">
+		<div class="tiles"></div>
+		<div class="player_cover">
+			<div class="player"></div>
+		</div>
+		<div style="display: none;">
+			<div class="coins"></div>
+		</div>
+		<div class="gameover" style="display: none;">
+			<h1>Game over!</h1>
+			<div>You fell in the water.</div>
+			<button onclick="newGame()">Reload</button>
+		</div>
+	</div>
+	<div class="spacer">
+		<div onclick="gameStart()" class="startBtn">Start</div>
+		<div>Points: <span class="points">0</span></div>
+	</div>
+	<div class="spacer">
+		<b>Controls:</b>
+		<table>
+			<tr>
+				<td>← ↑ ↓ →</td>
+				<td>Movement</td>
+			</tr>
+			<tr>
+				<td>SPACEBAR</td>
+				<td>Dash</td>
+			</tr>
+		</table>
+	</div>
+</div>
+
+<script type="text/javascript" src="js.js"></script>
+</body>
+</html>

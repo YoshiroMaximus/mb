@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Ultimatium</title>
+	<meta charset="utf-8">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<script type="text/javascript">
+
+var smiles = 0;
+var laughs = 0;
+var laughchance = 0.1;
+var sneers = 0;
+var frowns = 0;
+var frownchance = 0.1;
+var maxpopulation = 1000;
+var population = 1000;
+var happiness  = 0;
+var sadness = 0;
+var autosmile = 1200;
+var autosneer = 1200;
+var happypeople = 0;
+var sadpeople = 0;
+var smileinc = 1;
+var sneerinc = 1;
+var happytoken = 0;
+var sadtoken = 0;
+var happybar = 0;
+var sadbar = 0;
+var power = 0;
+
+function smile() {
+	smileTwo();
+	if (Math.random() * 100 <= 5) {
+		spawntask();
+	}
+}
+
+function smileTwo() {
+	smiles += smileinc;
+	happybar += smileinc;
+	population -= smileinc;
+	$('#smiles').html(smiles);
+	$('#population').html(population);
+	if (Math.random() <= laughchance) {
+		laughs++;
+		$('#laughs').html(laughs);
+	}
+}
+
+function sneer() {
+	sneerTwo();
+	if (Math.random() * 100 <= 5) {
+		spawntask();
+	}
+}
+
+function sneerTwo() {
+	sneers += sneerinc;
+	sadbar += sneerinc;
+	population -= sneerinc;
+	$('#sneers').html(sneers);
+	$('#population').html(population);
+	if (Math.random() <= frownchance) {
+		frowns++;
+		$('#frowns').html(frowns);
+	}
+}
+
+function happy() {
+	if (laughs >= 5 && autosmile >= 300) {
+		laughs -= 5;
+		autosmile -= 100;
+		happiness++;
+		$('#smiles').html(smiles);
+		$('#laughs').html(laughs);
+		$('#happiness').html(happiness);
+		autohappy();
+	}
+	else {
+		$('#log').html("You can't do that. Sorry!");
+	}
+}
+
+function sad() {
+	if (frowns >= 5 && autosneer >= 300) {
+		frowns -= 5;
+		autosneer -= 100;
+		sadness++;
+		$('#sneers').html(sneers);
+		$('#frowns').html(frowns);
+		$('#sadness').html(sadness);
+		autosad();
+	}
+	else {
+		$('#log').html("You can't do that. :(");
+	}
+}
+
+function newhappyperson() {
+	if (laughs >= 10) {
+		laughs -= 10;
+		happypeople++;
+		smileinc++;
+		$('#laughs').html(laughs);
+		$('#happypeople').html(happypeople);
+	}
+	else {
+		$('#log').html("You can't do that. More laughs!");
+	}
+}
+
+function newsadperson() {
+	if (frowns >= 10) {
+		frowns -= 10;
+		sadpeople++;
+		sneerinc++;
+		$('#frowns').html(frowns);
+		$('#sadpeople').html(sadpeople);
+	}
+	else {
+		$('#log').html("You can't do that. More frowns.");
+	}
+}
+
+var smileint;
+function autohappy() {
+	clearInterval(smileint);
+	smileint = setInterval(function() {
+		smile();
+	}, autosmile);
+}
+
+var sneerint;
+function autosad() {
+	clearInterval(sneerint);
+	sneerint = setInterval(function() {
+		sneer();
+	}, autosneer);
+}
+
+var endgame = setInterval(function() {
+	if (population <= 0) {
+		if (happybar >= sadbar) {
+			$('#log').html("Population bar filled with happy! Nice one, here's a happytoken.");
+			happytoken++;
+			$('#happytoken').html(happytoken);
+		}
+		else if (sadbar >= happybar) {
+			$('#log').html("The population bar was filled with sadness. Perfect, here's a sadtoken.");
+			sadtoken++;
+			$('#sadtoken').html(sadtoken);
+		}
+		else {
+			$('#log').html("Perfectly balanced, as all things should be.");
+		}
+		maxpopulation += 200;
+		population = maxpopulation;
+		happybar = 0;
+		sadbar = 0;
+		$('#population').html(population);
+
+	}
+
+	//additional interval functions
+
+	if (laughs >= 3) {
+		$('#overallhappiness').show(300);
+	}
+	if (frowns >= 3) {
+		$('#overallsadness').show(300);
+	}
+	if (laughs >= 6) {
+		$('#smilingpeople').show(300);
+	}
+	if (frowns >= 6) {
+		$('#sneeringpeople').show(300);
+	}
+
+	if (smiles >= 1) {
+		$('#sm').show(300);
+	}
+	if (sneers >= 1) {
+		$('#sn').show(300);
+	}
+	if (laughs >= 1) {
+		$('#l').show(300);
+	}
+	if (frowns >= 1) {
+		$('#f').show(300);
+	}
+	if (happiness >= 1) {
+		$('#h').show(300);
+	}
+	if (sadness >= 1) {
+		$('#s').show(300);
+	}
+	if (happypeople >= 1) {
+		$('#jp').show(300);
+	}
+	if (sadpeople >= 1) {
+		$('#dp').show(300);
+	}
+	if (smiles >= 1 || sneers >= 1) {
+		$('#p').show(300);
+	}
+
+	if (happytoken >= 1) {
+		$('#ht').show(300);
+	}
+	if (sadtoken >= 1) {
+		$('#st').show(300);
+	}
+
+	if (happytoken >= 1 || sadtoken >= 1) {
+		$('#SintoH').show(300);
+		$('#HintoS').show(300);
+	}
+
+	if (happytoken >= 3 || sadtoken >= 3) {
+		$('#prestige').show(300);
+	}
+
+	populationbar();
+}, 100);
+
+function populationbar() {
+	var myBar = document.getElementById("myBar");
+	var happypop = document.getElementById("happypop");
+	var sadpop = document.getElementById("sadpop");
+	var width = population / (maxpopulation / 100);
+	var happywidth = happybar / (maxpopulation / 100);
+	var sadwidth = sadbar / (maxpopulation / 100);
+	myBar.style.width = width + '%';
+	happypop.style.width = happywidth + '%';
+	sadpop.style.width = sadwidth + '%';
+}
+
+///////////////////////////////
+//fighting aspect of the game//
+///////////////////////////////
+
+var actions = [];
+
+function spawntask() {
+	if (smiles >= 30 || sneers >= 30) {
+		if (actions.length <= 9) {
+
+			var array = ['HappyBox!', 'SadBox...'];
+			var chosen = array[Math.floor(Math.random() * array.length)];
+
+			if (chosen == "HappyBox!") {
+				actions.push({
+					"name": "HappyBox!",
+					"hp": 25,
+					"type": "happy"
+				});
+			}
+			else if (chosen == "SadBox...") {
+				actions.push({
+					"name": "SadBox...",
+					"hp": 25,
+					"type": "sad"
+				});
+			}
+			update();
+		}
+	}
+}
+
+function update() {
+
+	for (var i = 0; i < actions.length; i++) {
+		if (actions[i].hp <= 0 || actions[i].name == "") {
+			actions.splice(i, 1, {
+				"name": "",
+				"hp": "<button onclick='finish(" + i + ")'>Open</button>",
+				"type": actions[i].type
+			});
+		}
+	}
+
+	$("#events").html("");
+	var i;
+	for (var i = 0; i < actions.length; i++) {
+		$("#events").append(
+			"<div onclick='doaction(" + i + ")'><span class='delmark' onclick='delmark(" + i + ")'>&#x00D7;</span>" + actions[i].name + "<br>" + actions[i].hp + "</div>"
+		);
+	}
+
+	$("#events div:contains('HappyBox!')").addClass("yellowborder");
+	$("#events div:contains('SadBox...')").addClass("blueborder");
+}
+
+function delmark(i) {
+	actions.splice(i, 1);
+	update();
+}
+
+function doaction(i) {
+	if (actions[i] != undefined) {
+		if (actions[i].name != "") {
+			actions[i].hp -= 5;
+			update();
+		}
+	}
+}
+
+function finish(i) {
+	if (actions[i].type == "happy") {
+		$('#log').html("You open a HappyBox. It contains smiles!");
+		var k;
+		for (var k = 0; k < 10; k++) {
+			smileTwo();
+		}
+	}
+	else if (actions[i].type == "sad") {
+		$('#log').html("You open a SadBox... It contains sneers.");
+		var k;
+		for (var k = 0; k < 10; k++) {
+			sneerTwo();
+		}
+	}
+	actions.splice(i, 1);
+	update();
+}
+
+
+
+function help() {
+	$('#helpbox').toggle(300);
+}
+
+function header() {
+	$('#header').fadeToggle(300);
+}
+
+function toggletheme() {
+	$('body').toggleClass("wob");
+}
+
+function world() {
+	$('.tab .tab__link').removeClass("selected");
+	$('.tab .worldtab').addClass("selected");
+	$('.page').hide();
+	$('#world').show();
+}
+
+function universe() {
+	$('.tab .tab__link').removeClass("selected");
+	$('.tab .universetab').addClass("selected");
+	$('.page').hide();
+	$('#universe').show();
+}
+
+function info() {
+	$('.tab .tab__link').removeClass("selected");
+	$('.tab .infotab').addClass("selected");
+	$('.page').hide();
+	$('#info').show();
+}
+
+function costSgiveS() {
+	if (sadtoken >= 1) {
+		sadtoken--;
+		$("#sadtoken").html(sadtoken);
+		sneers += smiles;
+		smiles -= smiles;
+		frowns += laughs;
+		laughs -= laughs;
+		$("#sneers").html(sneers);
+		$("#smiles").html(smiles);
+		$("#frowns").html(frowns);
+		$("#laughs").html(laughs);
+		$('#log').html("A wave of depression sweeps over the world. All happiness is turned into sadness.");
+
+		sadbar += happybar;
+		happybar -= happybar;
+		populationbar();
+	}
+	else {
+		$('#log').html("You don't have enough Sad Tokens to do this.");
+	}
+}
+
+function costHgiveH() {
+	if (happytoken >= 1) {
+		happytoken--;
+		$("#happytoken").html(happytoken);
+		smiles += sneers;
+		sneers -= sneers;
+		laughs += frowns;
+		frowns -= frowns;
+		$("#smiles").html(smiles);
+		$("#sneers").html(sneers);
+		$("#laughs").html(laughs);
+		$("#frowns").html(frowns);
+		$('#log').html("A wave of joy sweeps over the world. All sadness is transformed into happiness.");
+
+		happybar += sadbar;
+		sadbar -= sadbar;
+		populationbar();
+	}
+	else {
+		$('#log').html("You don't have enough Happy Tokens to do this!");
+	}
+}
+
+function plusitup() {
+	happytoken = 100;
+	sadtoken = 100;
+}
+
+function prestigeHappy() {
+	if (happytoken >= 10) {
+		happytoken -= 10;
+		$("#happytoken").html(happytoken);
+
+		var powerinc = smiles + laughs + sneers + frowns + happiness + sadness + happypeople + sadpeople;
+		power += powerinc;
+		$("#power").html(power);
+
+		smiles = 0;				$("#smiles").html(smiles);
+		laughs = 0;				$("#laughs").html(laughs);
+		laughchance = 0.1;		//non html
+		sneers = 0;				$("#sneers").html(sneers);
+		frowns = 0;				$("#frowns").html(frowns);
+		frownchance = 0.1;		//non html
+		maxpopulation = 1000;	//non html
+		population = 1000;		$('#population').html(population);
+		happiness  = 0;			$("#happiness").html(happiness);
+		sadness = 0;			$("#sadness").html(sadness);
+		autosmile = 1200;		//non html
+		autosneer = 1200;		//non html
+		happypeople = 0;		$("#happypeople").html(happypeople);
+		sadpeople = 0;			$("#sadpeople").html(sadpeople);
+		smileinc = 1;			//non html
+		sneerinc = 1;			//non html
+		happybar = 0;			//non html
+		sadbar = 0;				//non html
+
+		clearInterval(smileint);
+		clearInterval(sneerint);
+
+		actions = [];
+		update();
+		$('#log').html("You move away from this world, leaving it forever. Your power increases.");
+	}
+	else {
+		$('#log').html("Not enough Happy Tokens. Your work is not done!");
+	}
+}
+
+function prestigeSad() {
+	if (sadtoken >= 10) {
+		sadtoken -= 10;
+		$("#sadtoken").html(sadtoken);
+
+		power += (smiles + laughs + sneers + frowns + maxpopulation + happiness + sadness + happypeople + sadpeople);
+		$("#power").html(power);
+
+		smiles = 0;				$("#smiles").html(smiles);
+		laughs = 0;				$("#laughs").html(laughs);
+		laughchance = 0.1;		//non html
+		sneers = 0;				$("#sneers").html(sneers);
+		frowns = 0;				$("#frowns").html(frowns);
+		frownchance = 0.1;		//non html
+		maxpopulation = 1000;	//non html
+		population = 1000;		$('#population').html(population);
+		happiness  = 0;			$("#happiness").html(happiness);
+		sadness = 0;			$("#sadness").html(sadness);
+		autosmile = 1200;		//non html
+		autosneer = 1200;		//non html
+		happypeople = 0;		$("#happypeople").html(happypeople);
+		sadpeople = 0;			$("#sadpeople").html(sadpeople);
+		smileinc = 1;			//non html
+		sneerinc = 1;			//non html
+		happybar = 0;			//non html
+		sadbar = 0;				//non html
+
+		clearInterval(smileint);
+		clearInterval(sneerint);
+
+		actions = [];
+		update();
+		$('#log').html("You move away from this world, leaving it forever. Your power increases.");
+	}
+	else {
+		$('#log').html("Not enough Sad Tokens. Your work is not done.");
+	}
+}
+
+</script>
+</head>
+<body>
+
+<div id="header">
+	<ul id="tabmenu">
+		<li class="tab" onclick="world()">
+			<a class="worldtab tab__link selected">
+				World
+			</a>
+		</li>
+		<li class="tab">
+			<a class="universetab tab__link" onclick="universe()">
+				Universe
+			</a>
+		</li>
+		<li class="tab">
+			<a class="infotab tab__link" onclick="info()">
+				Info
+			</a>
+		</li>
+	</ul>
+</div>
+
+<div style="float: right; margin: 20px 20px 0 10px;">
+	<a class="help" onclick="header()">[Header]</a>
+</div>
+
+<div class="mainbox">
+	<div class="page" id="world">
+		<div class="row">
+			<div class="box">
+				<div class="col">
+					<div id='smileaction' class='marginb'>
+						Say hello to someone with a smile. <a class="action" onclick="smile()">[Action]</a>
+					</div>
+					<div id='sneeraction' class='marginb'>
+						Tell someone to go away with a sneer. <a class="action" onclick="sneer()">[Action]</a>
+					</div>
+					<div id='overallhappiness' class='marginb'>
+						The overall happiness of the world increases. <a class="action yellow" onclick="happy()">[5 laughs]</a>
+					</div>
+					<div id='smilingpeople' class='marginb'>
+						People are smiling to eachother now. <a class="action yellow" onclick="newhappyperson()">[10 laughs]</a>
+					</div>
+					<div id='overallsadness' class='marginb'>
+						The overall sadness of the world increases. <a class="action blue" onclick="sad()">[5 frowns]</a>
+					</div>
+					<div id='sneeringpeople' class='marginb'>
+						People are sneering at eachother now. <a class="action blue" onclick="newsadperson()">[10 frowns]</a>
+					</div>
+				</div>
+				<div class="col">
+					<div id="SintoH" class="marginb">
+						Change all sneers and frowns into smiles and laughs. <a class="action yellow" onclick="costHgiveH()">[1 H Token]</a>
+					</div>
+					<div id="HintoS" class="marginb">
+						Convert every smile and laugh into sneers and frowns. <a class="action blue" onclick="costSgiveS()">[1 S Token]</a>
+					</div>
+					<br>
+					<div id="prestige" class="marginb">
+						Move from this planet, and start afresh. <a class="action yellow" onclick="prestigeHappy()">[10 H Tokens]</a> or <a class="action blue" onclick="prestigeSad()">[10 S Tokens]</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="box">
+				<div class="col">
+					<div id="sm">Smiles: <span class="yellow" id="smiles">0</span></div>
+					<div id="l">Laughs: <span class="yellow" id="laughs">0</span></div>
+					<div id="h">Happiness: <span class="yellow" id="happiness">0</span></div>
+					<div id="jp">Joyful people: <span class="yellow" id="happypeople">0</span></div>
+					<div id="sn">Sneers: <span class="blue" id="sneers">0</span></div>
+					<div id="f">Frowns: <span class="blue" id="frowns">0</span></div>
+					<div id="s">Sadness: <span class="blue" id="sadness">0</span></div>
+					<div id="dp">Depressed people: <span class="blue" id="sadpeople">0</span></div>
+					<br>
+					<div id="log"></div>
+				</div>
+				<div class="col">
+					<div id="p">Population: <span id="population">1000</span>
+						<div id="myProgress">
+							<div id="myBar"></div>
+							<div id="happypop"></div>
+							<div id="sadpop"></div>
+						</div>
+					</div>
+					<br>
+					<div>
+						<div id="ht">H Tokens: <span class="yellow" id="happytoken">0</span></div>
+						<div id="st">S Tokens: <span class="blue" id="sadtoken">0</span></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="box">
+				<div id="events"></div>
+			</div>
+		</div>
+	</div>
+	<div class="page" id="universe">
+		<div class="box">
+			<div>Nothing happens here yet. Power is currently a useless stat.</div>
+			<br>
+			<div>Power: <span id="power">0</span></div>
+		</div>
+	</div>
+	<div class="page" id="info">
+		<div class="info">
+			<div class="box">
+				<div id="helpbox">
+					<h1>Ultimatium, a game by KudosInc (Guy).</h1>
+					<h3>This is the second "real" game I've made using Javascript. It also uses the popular Javascript library jQuery.</h3>
+					<div><b>Help/Guide/Definitions:</b></div>
+					<ul>
+						<li>Happiness is the speed at which smiles and laughs are generated.</li>
+						<li>Joyous people increase the number of smiles generated per click/per tick.</li>
+						<li>The same logic applies to other emotions.</li>
+					</ul>
+					<ul>
+						<li>The population is the number of people yet to have an emotion.</li>
+						<li>When this bar fills, you will be rewarded and it will be reset.</li>
+					</ul>
+					<ul>
+						<li>You can also find HappyBoxes and SadBoxes, which give a little increase in their respective emotions when clicked.</li>
+					</ul>
+					<div class="marginb">Next stop: Adding the ability to save.</div>
+					<div class="marginb">Also... items!</div>
+					<div class="marginb"><a class="action" onclick="toggletheme()">Toggle Theme</a></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+
+<style type="text/css">
+
+.page {
+	height: 100%;
+}
+
+.col {
+	display: inline-block;
+	width: 40%;
+	float: left;
+}
+
+#events div {
+	position: relative;
+	display: inline-block;
+	height: 100px;
+	width: 100px;
+	line-height: 25px;
+	text-align: center;
+	border: 1px solid limegreen;
+	margin: 5px;
+	cursor: pointer;
+	user-select: none;
+	overflow: hidden;
+	display:inline-flex;
+	justify-content:center;
+	align-items:center;
+	vertical-align: top;
+}
+
+#events div button {
+	background-color: transparent;
+	border: 1px solid limegreen;
+	color: inherit;
+	padding: 5px 10px;
+}
+
+.delmark {
+	position: absolute;
+	top: -5px;
+	right: 5px;
+}
+
+.delmark:hover {
+	color: red;
+}
+
+#events div button:hover {
+	background-color: rgba(50, 205, 50, 0.1);
+}
+
+button:focus {
+	outline: none;
+}
+
+#tabmenu {
+	margin: 0;
+	padding: 0;
+	text-align: center;
+	display: table;
+	table-layout: fixed;
+	width: 100%;
+}
+
+.tab {
+	display: table-cell;
+}
+
+.tab__link {
+	cursor: pointer;
+	display: block;
+	margin: 0 3px;
+	padding: 5px;
+	border: 1px solid limegreen;
+}
+
+.tab__link:hover,
+.tab__link.selected {
+	background-color: rgba(50, 205, 50, 0.1);
+}
+
+#myProgress {
+	margin: 10px 0;
+	width: 120px;
+	overflow: hidden;
+}
+
+#myBar,
+#happypop,
+#sadpop {
+	float: right;
+	width: 100%;
+	height: 10px;
+	background-color: #0f3e0f;
+	transition: 100ms;
+}
+
+#happypop {
+	background-color: yellow;
+}
+
+#sadpop {
+	background-color: dodgerblue;
+}
+
+.marginb {
+	margin-bottom: 10px;
+}
+
+#SintoH,
+#HintoS,
+#prestige,
+#universe,
+#info,
+#header,
+#overallhappiness,
+#overallsadness,
+#smilingpeople,
+#sneeringpeople {
+	display: none;
+}
+
+#ht,
+#st,
+#sm,
+#l,
+#h,
+#jp,
+#sn,
+#f,
+#s,
+#dp,
+#p {
+	display: none;
+}
+
+body, button {
+	font-family: monospace;
+	font-size: 15px;
+}
+
+body {
+	color: limegreen;
+	background-color: #222;
+	margin: 0;
+	height: 100vh;
+	transition: 300ms ease-in;
+}
+
+.action {
+	color: coral;
+	cursor: pointer;
+	user-select: none;
+}
+
+.action:active {
+	color: orange;
+}
+
+.yellow {
+	color: yellow;
+}
+
+.blue {
+	color: dodgerblue;
+}
+
+.yellowborder {
+	color: yellow;
+	border: 1px solid yellow!important;
+}
+
+.blueborder {
+	color: dodgerblue;
+	border: 1px solid dodgerblue!important;
+}
+
+.help {
+	color: yellowgreen;
+	cursor: pointer;
+}
+
+#header {
+	padding: 5px 17px;
+	height: 30px;
+}
+
+.box {
+	padding: 20px;
+}
+
+.mainbox {
+	height: calc(100% - 40px);
+}
+
+.row {
+	height: 25%;
+	overflow: auto;
+}
+
+#helpbox ul {
+	list-style-type: none;
+	padding: 0;
+}
+
+#helpbox li:before {
+	content: "\00D7  ";
+}
+
+/*
+	THE WHITE ON BLACK THEME
+								*/
+
+.wob #events div {
+	border: 1px solid #999;
+}
+
+.wob #events div button {
+	background-color: transparent;
+	border: 1px solid #999;
+}
+
+.wob .delmark:hover {
+	color: red;
+}
+
+.wob #events div button:hover {
+	background-color: rgba(0, 0, 0, 0.05);
+}
+
+.wob .tab__link {
+	border: 1px solid #222;
+}
+
+.wob .tab__link:hover,
+.wob .tab__link.selected {
+	background-color: rgba(0, 0, 0, 0.05);
+}
+
+.wob #myBar,
+.wob #happypop,
+.wob #sadpop {
+	background-color: #eee;
+}
+
+.wob #happypop {
+	background-color: #ffbb00;
+}
+
+.wob #sadpop {
+	background-color: dodgerblue;
+}
+
+.wob {
+	background-color: white;
+	color: #222;
+}
+
+.wob .action {
+	color: tomato;
+	font-weight: bold;
+}
+
+.wob .action:active {
+	color: coral;
+}
+
+.wob .yellow {
+	color: #ffbb00;
+	font-weight: bold;
+}
+
+.wob .blue {
+	color: dodgerblue;
+	font-weight: bold;
+}
+
+.wob .yellowborder {
+	color: #ffbb00;
+	font-weight: bold;
+	border: 1px solid #ffbb00!important;
+}
+
+.wob .blueborder {
+	color: dodgerblue;
+	font-weight: bold;
+	border: 1px solid dodgerblue!important;
+}
+
+.wob .help {
+	color: teal;
+	font-weight: bold;
+}
+
+</style>
+</html>

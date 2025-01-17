@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>sidescr</title>
+	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+</head>
+<body onKeyDown="Down(event)" onKeyUp="Up(event)">
+
+<div class="game">
+	<div class="window">
+		<img class="bg1" style="height: 1500px; width: 4100px;">
+		<div class="char"></div>
+
+		<div class="card start-card">
+			You feel out of place...<br>Don't worry! Belonging is just around the corner.
+		</div>
+
+		<div class="card key-card">
+			You need a key to enter here...
+		</div>
+		<div class="card open-card">
+			The door opens easily.<br><span class="mono">PRESS X</span>
+		</div>
+		<div class="card fly-card">
+			Nice job getting up here.<br>Here's your reward.<br><span class="mono">PRESS X TO FLY</span>
+		</div>
+		<div class="card tp-card">
+			Sit down, relax.<br>Here's a key, by the way.<br><span class="mono">PRESS X</span>
+		</div>
+		<div class="card end-card">
+			Hey! There you are. Come sit down.<br><span class="mono">PRESS X</span>
+		</div>
+
+		<div class="rbody splat-toggle">
+			<div class="rain front-row"></div>
+		</div>
+	</div>
+</div>
+
+<p class="mono">ARROW KEYS TO MOVE<br>X TO INTERACT</p>
+<p class="inv"></p>
+
+<style type="text/css">
+@import url('https://fonts.googleapis.com/css?family=Geo&display=swap');
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	font-family: 'Geo', sans-serif;
+	font-size: 20px;
+	background-color: #111;
+	text-align: center;
+	color: white;
+}
+
+.game {
+	position: relative;
+	margin-bottom: 20rem;
+	margin: -350px 0;
+	transform: scale(0.5);
+}
+
+.window {
+	display: block;
+	margin: 0 auto;
+	height: 1500px;
+	width: 800px;
+	overflow: hidden;
+	position: relative;
+}
+
+.mono {
+	font-variant: small-caps;
+	opacity: 0.5;
+}
+
+.card {
+	display: block;
+	position: absolute;
+	padding: 2rem;
+	background-color: #21232c;
+	color: white;
+	font-size: 38px;
+}
+
+.card.start-card {
+	bottom: 300px;
+	left: 5px;
+}
+
+.card.key-card {
+	bottom: 300px;
+	left: 150px;
+}
+
+.card.open-card {
+	bottom: 300px;
+	left: 200px;
+}
+
+.card.fly-card {
+	top: 400px;
+	right: 20px;
+}
+
+.card.tp-card {
+	bottom: 300px;
+	right: 20px;
+}
+
+.card.end-card {
+	top: 320px;
+	right: 20px;
+}
+
+.bg1 {
+	background-color: #000;
+	background-image: url(images/haus.png);
+	background-position: 0 0;
+	background-size: 100% auto;
+}
+
+.char {
+	position: absolute;
+	bottom: 40px;
+	left: calc(50% - 40px);
+	height: 160px;
+	width: 80px;
+	background-size: 640px;
+	background-image: url(images/spritesheet_lg.png);
+	background-position: 0 0;
+}
+
+.animate {
+	animation: animate 800ms infinite;
+	animation-timing-function: steps(4);
+}
+
+@keyframes animate {
+	from {
+		background-position: 0 160px;
+	}
+	to {
+		background-position: -320px 160px;
+	}
+}
+
+.flying {
+	animation: flying 400ms infinite;
+	animation-timing-function: steps(3);
+}
+
+@keyframes flying {
+	from {
+		background-position: -320px 160px;
+	}
+	to {
+		background-position: -560px 160px;
+	}
+}
+
+.sitting {
+	animation: sitting 500ms;
+	animation-timing-function: steps(2);
+	animation-fill-mode: forwards;
+}
+
+@keyframes sitting {
+	from {
+		background-position: -160px 0;
+	}
+	to {
+		background-position: -320px 0;
+	}
+}
+
+.getup {
+	animation: getup 500ms;
+	animation-timing-function: steps(2);
+}
+
+@keyframes getup {
+	from {
+		background-position: -320px 0;
+	}
+	to {
+		background-position: -160px 0;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+.rbody {
+	position: absolute;
+	top: 0;
+	left: 0;
+	overflow: hidden;
+	height: 100%;
+	width: 100%;
+	border: 1px solid white;
+}
+
+.rain {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.drop {
+  position: absolute;
+  bottom: 100%;
+  width: 15px;
+  height: 120px;
+  pointer-events: none;
+  animation: drop 0.5s linear infinite;
+}
+
+@keyframes drop {
+  0% {
+    transform: translateY(0vh);
+  }
+  75% {
+    transform: translateY(1635px);
+  }
+  100% {
+    transform: translateY(1635px);
+  }
+}
+
+.stem {
+  width: 3px;
+  height: 60%;
+  margin-left: 7px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.25));
+  animation: stem 0.5s linear infinite;
+}
+
+@keyframes stem {
+  0% {
+    opacity: 1;
+  }
+  65% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.splat {
+  width: 30px;
+  height: 20px;
+  border-top: 4px dotted rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  opacity: 1;
+  transform: scale(0);
+  animation: splat 0.5s linear infinite;
+  display: black;
+}
+
+@keyframes splat {
+  0% {
+    opacity: 1;
+    transform: scale(0);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(0);
+  }
+  90% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+</style>
+<script type="text/javascript">
+
+var hasKey = false;
+var hasFlight = false;
+var thruDoor = false;
+var gameOver = false;
+
+var y = 40;
+var x = 0;
+var speed = 3;
+
+var pressedl = 0;
+var pressedr = 0;
+var pressedu = 0;
+var pressedd = 0;
+
+var sitting = false;
+
+function Down(e) {
+	if (!gameOver) { //can't move if the game is over
+		cxc = e.keyCode;
+
+		if (cxc == 38) {
+			if (sitting == true) {
+				getup();
+			}
+			else if (hasFlight) {
+				pressedu = 1;
+			}
+		}
+
+		if(cxc == 40) {
+			if (!hasFlight) {
+				sit();
+			}
+			else {
+				pressedd = 1;
+			}
+		}
+
+		if(cxc == 37) {
+			pressedl = 1;
+		}
+		if(cxc == 39) {
+			pressedr = 1;
+		}
+
+		//pressing x
+		if(cxc == 88) {
+			pressX();
+		}
+	}
+}
+
+function Up(e) {
+	cxc = e.keyCode;
+
+	$('.char').removeClass("animate");
+	if(cxc == 37) {
+		pressedl = 0;
+	}
+	if(cxc == 39) {
+		pressedr = 0;
+	}
+	if(cxc == 38) {
+		pressedu = 0;
+	}
+	if(cxc == 40) {
+		pressedd = 0;
+	}
+}
+
+function sit() {
+	sitting = true;
+	$('.char').removeClass("getup");
+	$('.char').addClass("sitting");
+}
+
+function getup() {
+	sitting = false;
+	$('.char').removeClass("sitting");
+	$('.char').addClass("getup");
+	setTimeout(function() {
+		$('.char').removeClass("getup");
+	}, 500);
+}
+
+setInterval(function() {
+	if (pressedl == 1 && sitting == false) {
+		x += speed;
+		$('.char').addClass("animate");
+		$('.char').css({
+			"transform" : "scaleX(-1)"
+		});
+	}
+	if (pressedr == 1 && sitting == false) {
+		x -= speed;
+		$('.char').addClass("animate");
+		$('.char').css({
+			"transform" : "scaleX(1)"
+		});
+	}
+	if (pressedu == 1) {
+		y += speed;
+	}
+	if (pressedd == 1) {
+		y -= speed;
+	}
+
+	//flying animations
+	if (hasFlight) {
+		$('.char').addClass('flying');
+	}
+
+	update();
+}, 10);
+
+function update() {
+	var bgWidth = $('.bg1').width();
+	var windowWidth = $('.window').width();
+	if (x*-1 <= 0) {
+		x = 0;
+	}
+	if (x*-1 >= bgWidth - windowWidth) {
+		x = (bgWidth - windowWidth)*-1;
+	}
+	$('.bg1').css({
+		"margin-left" : x
+	});
+
+	//flying
+	$('.char').css({
+		'bottom': y + 'px'
+	});
+
+	$('.card').hide();
+	var left = x*-1;
+
+	if (left > -1 && left < 300) {
+		$('.start-card').show();
+	}
+	if (left > 300) {
+		$('.start-card').remove();
+	}
+
+	if (left > 950 && left < 1070) {
+		if (thruDoor) {
+			$('.fly-card').show();
+		}
+		else {
+			if (hasKey) {
+				$('.open-card').show();
+			}
+			else {
+				$('.key-card').show();
+			}
+		}
+	}
+	if (left > 2620 && left < 2740) {
+		if (!hasFlight) {
+			$('.tp-card').show();
+		}
+		else if (y > 700) {
+			$('.end-card').show();
+		}
+	}
+}
+
+function pressX() {
+	var left = x*-1;
+
+	if (left > 950 && left < 1070 && hasKey) {
+		if (!thruDoor) {
+			y = 700;
+			update();
+			$('.key-card').remove();
+			$('.open-card').remove();
+			thruDoor = true;
+		}
+		else {
+			$('.fly-card').remove();
+			hasFlight = true;
+			updateInv();
+		}
+	}
+	if (left > 2620 && left < 2740) {
+		if (!hasKey) {
+			$('.tp-card').remove();
+			hasKey = true;
+			updateInv();
+		}
+		else if (y > 700) {
+			$('.char').removeClass('flying');
+			x = -2570;
+			y = 1220;
+			update();
+			sit();
+			gameOver = true;
+			updateInv();
+		}
+	}
+}
+
+function updateInv() {
+	$('.inv').html('');
+	if (hasKey) {
+		$('.inv').append('<div>The Yellow Key</div>');
+	}
+	if (hasFlight) {
+		$('.inv').append('<div>The Gift of Flight</div>');
+	}
+	if (gameOver) {
+		$('.inv').append('<div>Belonging</div><div><span class="mono">(END)</span></div>');
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var makeItRain = function() {
+  //clear out everything
+  $('.rain').empty();
+
+  var increment = 0;
+  var drops = "";
+
+  while (increment < 100) {
+    //couple random numbers to use for various randomizations
+    //random number between 98 and 1
+    var randoHundo = (Math.floor(Math.random() * (98 - 1 + 1) + 1));
+    //random number between 5 and 2
+    var randoFiver = (Math.floor(Math.random() * (5 - 2 + 1) + 2));
+    //increment
+    increment += randoFiver;
+    //add in a new raindrop with various randomizations to certain CSS properties
+    drops += '<div class="drop" style="left: ' + increment + '%; bottom: ' + (randoFiver + randoFiver - 1 + 100) + '%; animation-delay: 0.' + randoHundo + 's; animation-duration: 0.5' + randoHundo + 's;"><div class="stem" style="animation-delay: 0.' + randoHundo + 's; animation-duration: 0.5' + randoHundo + 's;"></div><div class="splat" style="animation-delay: 0.' + randoHundo + 's; animation-duration: 0.5' + randoHundo + 's;"></div></div>';
+  }
+
+  $('.rain.front-row').append(drops);
+}
+
+makeItRain();
+</script>
+</body>
+</html>

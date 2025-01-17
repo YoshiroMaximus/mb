@@ -1,0 +1,35 @@
+*,
+*:before,
+*:after {
+	box-sizing: border-box;
+}
+
+html {
+	font-size: 10px;
+}
+
+body {
+	height: 100vh;
+	font-family: 'Jost', sans-serif;
+	font-size: 24px;
+	background-color: #140152;
+	color: aliceblue;
+	overflow: hidden;
+}
+
+#wrapper {
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#temp {
+	display: none;
+}
+
+#sidebar {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
