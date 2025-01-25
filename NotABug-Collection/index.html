@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>notAbug-collection 🔥</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --dark-bg: #1e293b;
+            --light-bg: #f3f4f6;
+            --text-dark: #1e293b;
+            --text-light: #ffffff;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s, color 0.3s;
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+        }
+        .hover-gradient {
+            background-color: #4f46e5;
+            transition: background 0.3s, transform 0.2s;
+        }
+        .hover-gradient:hover {
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
+            transform: translateY(-2px);
+        }
+        .menu-links a {
+            width: 220px;
+            text-align: center;
+        }
+        @media (max-width: 640px) {
+            .menu-links a {
+                width: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-links flex flex-col space-y-4">
+        <a href="mb/Snowball" class="hover-gradient text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300">Snowball</a>
+        <a href="mb/Snowling" class="hover-gradient text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300">Snowling</a>
+        <a href="mb/CubeShooter" class="hover-gradient text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300">CubeShooter</a>
+        <a href="mb/SpaceMiner" class="hover-gradient text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300">SpaceMiner</a>
+        <a href="mb/Snowboarder" class="hover-gradient text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300">Snowboarder</a>
+    </div>
+</body>
+</html>
